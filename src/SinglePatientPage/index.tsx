@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { Patient } from '../types';
 
 import { Icon } from 'semantic-ui-react';
-import { useStateValue } from '../state';
+import { useStateValue, editPatient } from '../state';
 
 const SinglePatient: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,7 +16,7 @@ const SinglePatient: React.FC = () => {
     const getPatient = async () => {
       try {
         const { data: patientFromApi } = await axios.get<Patient>(`${apiBaseUrl}/patients/${id}`);
-        dispatch({ type: "ADD_PATIENT_LIST", payload: patientFromApi });
+        dispatch(editPatient(patientFromApi));
       } catch (e) {
         console.error(e.message);
       }

@@ -3,10 +3,11 @@ import axios from 'axios';
 import { apiBaseUrl } from '../constants';
 
 import { useParams } from 'react-router-dom';
-import { Patient, Entry } from '../types';
+import { Patient } from '../types';
 
 import { Icon } from 'semantic-ui-react';
 import { useStateValue, editPatient } from '../state';
+import Entries from './Entries';
 
 const SinglePatient: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,41 +50,6 @@ const SinglePatient: React.FC = () => {
         return <></>;
     }
   };
-  console.log({ patient });
-
-  const entries = () => {
-    if (!patient.entries || patient.entries.length < 1) {
-      return null;
-    }
-    const entries = patient.entries;
-
-    const diagnoseCodes = (entry: Entry) => {
-      console.log({ entry });
-      if (!entry.diagnosisCodes || entry.diagnosisCodes.length < 1) {
-        return null;
-      }
-      return (
-        <ul>
-          {entry.diagnosisCodes.map(code =>
-            <li key={code}>{code}</li>
-          )}
-        </ul>
-      );
-    };
-
-    return (
-      <div>
-        <h4>entries</h4>
-        {entries.map(entry =>
-          <div key={entry.id}>
-            {entry.date} {entry.description}
-            {diagnoseCodes(entry)}
-            <hr />
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div>
@@ -93,7 +59,8 @@ const SinglePatient: React.FC = () => {
       </h2>
       <p>ssn:{patient.ssn}</p>
       <p>occupation:{patient.occupation}</p>
-      {entries()}
+      
+      <Entries entries={patient.entries} />
     </div>
   );
 };

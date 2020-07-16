@@ -3,11 +3,14 @@ import axios from 'axios';
 import { apiBaseUrl } from '../constants';
 
 import { useParams } from 'react-router-dom';
-import { Patient } from '../types';
+import { Patient, HealthCheckEntry, Entry } from '../types';
 
 import { Icon } from 'semantic-ui-react';
-import { useStateValue, editPatient } from '../state';
+import { useStateValue, editPatient, updatePatient } from '../state';
 import Entries from './Entries';
+import EntryForm from './EntryForm';
+
+export type EntryFormValues = Omit<HealthCheckEntry, 'id' | 'type'>;
 
 const SinglePatient: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,6 +54,18 @@ const SinglePatient: React.FC = () => {
     }
   };
 
+  const onSubmit = async (values: EntryFormValues) => {
+    try {
+      const { data: entryFromApi } = await axios.post<Entry>(`${apiBaseUrl}/patients/${id}/entries`, values);
+      const p = patient.entries ? {...patient, entries: patient.entries.concat(entryFromApi)} : {...patient, entries: [entryFromApi]};
+      dispatch(updatePatient(p));
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
+    }
+  };
+
   return (
     <div>
       <h2>
@@ -59,10 +74,12 @@ const SinglePatient: React.FC = () => {
       </h2>
       <p>ssn:{patient.ssn}</p>
       <p>occupation:{patient.occupation}</p>
-      
+
       <Entries entries={patient.entries} />
+      <EntryForm onSubmit={onSubmit} />
     </div>
   );
 };
+
 
 export default SinglePatient;
